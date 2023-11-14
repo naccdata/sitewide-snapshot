@@ -15,7 +15,8 @@
     "snapshot name": {
       "description": "A name to associate with this collection of snapshots",
       "type": "string"
-    },
+    }
+  }
   "custom": {
     "flywheel": {
       "suite": "FW-Templates",
