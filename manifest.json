@@ -7,31 +7,38 @@
       "default": false,
       "description": "Log debug messages",
       "type": "boolean"
-    }
-  },
+    },
+    "project filter": {
+      "description": "A finder filter to use to select projects to include in the snapshot ('label=mylabel', 'group=mygroup', etc).  Will snapshot ALL matching projects.  If you want all projects snapshotted, enter 'ALL'",
+      "type": "string"
+    },
+    "snapshot name": {
+      "description": "A name to associate with this collection of snapshots",
+      "type": "string"
+    },
   "custom": {
     "flywheel": {
       "suite": "FW-Templates",
       "show-job": true
     },
     "gear-builder": {
-      "category": "converter",
-      "image": "flywheel/skeleton:0.3.0"
+      "category": "utility",
+      "image": "flywheel/sitewide_snapshot:0.0.1"
     }
   },
-  "description": "{{ }}",
+  "description": "Triggers a site-wide snapshot based off a provided filter",
   "environment": {},
   "inputs": {
-    "{{text-input}}": {
-      "base": "file",
-      "description": "{{A text file.}}"
+    "api-key": {
+      "base": "api-key",
+      "read-only": false
     }
   },
-  "label": "FW skeleton gear",
+  "label": "Sitewide Snapshot",
   "license": "Other",
   "maintainer": "Flywheel <support@flywheel.io>",
-  "name": "skeleton",
+  "name": "sitewide_snapshot",
   "source": "https://gitlab.com/flywheel-io/scientific-solutions/etc/utlis/skeleton",
   "url": "https://gitlab.com/flywheel-io/scientific-solutions/etc/utlis/skeleton",
-  "version": "0.3.0"
+  "version": "0.0.1"
 }
