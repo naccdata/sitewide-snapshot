@@ -12,11 +12,11 @@
       "description": "A finder filter to use to select projects to include in the snapshot ('label=mylabel', 'group=mygroup', etc).  Will snapshot ALL matching projects.  If you want all projects snapshotted, enter 'ALL'",
       "type": "string"
     },
-    "snapshot name": {
+    "snapshot collection name": {
       "description": "A name to associate with this collection of snapshots",
       "type": "string"
     }
-  }
+  },
   "custom": {
     "flywheel": {
       "suite": "FW-Templates",

@@ -3,6 +3,8 @@ import datetime
 import pandas as pd
 import snapshot_utils
 
+RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
+
 
 @dataclass
 class SnapshotRecordItem:
@@ -41,6 +43,39 @@ class TriggerSnapshots:
     def __init__(self, client: FWClient):
         self.client = client
         self.dry_run = False
+        self.collection_name
+        self.snapshots = []
+
+
+    def trigger_snapshots_on_filter(
+        self,
+        project_filter,
+    ) -> pd.DataFrame:
+        """Trigger snapshots on projects matching a filter
+
+        Args:
+            project_filter: the filter to use
+
+        Returns:
+            a dataframe of snapshot records
+        """
+        projects = self.find_projects_with_filter(project_filter)
+        for project in projects:
+            log.debug(f"Triggering snapshot on project {project.get('label')}")
+            _ = self.make_snapshot_on_project(project)
+
+    def find_projects_with_filter(self, project_filter: str) -> List[flywheel.Project]:
+        """Find projects with a filter
+
+        Args:
+            project_filter: the filter to use
+
+        Returns:
+            a list of projects
+        """
+        projects = self.client.get("/api/projects", params={"filter": project_filter})
+        log.debug(f"found {len(projects)} projects")
+        return projects
 
     def make_snapshot_on_project(
         self, project: Union[str, flywheel.Project, fw_client.dicts.AttrDict]
@@ -64,9 +99,56 @@ class TriggerSnapshots:
             project_id = project.get("_id")
 
         if not project_id:
-            raise ValueError(f"no project ID found on project")
+            raise ValueError(f"no project ID found for project {project}")
 
         return self.make_snapshot_on_id(project_id)
+
+    def make_snapshot_on_id(self, project_id: str) -> str:
+        """Make a snapshot on a project given a project ID
+
+        Args:
+            project_id: the ID of the project
+
+        Returns:
+            the ID of the snapshot
+        """
+        snapshot_id = None
+        if self.dry_run:
+            snapshot_id = self.dryrun_snapshot(project_id)
+
+        log.debug(f"creating snapshot on {project_id}")
+        try:
+            snapshot_id = snapshot_utils.make_snapshot(self.client, project_id)
+            self.log_snapshot(project_id, snapshot_id)
+        except Exception as e:
+            self.log_snapshot(project_id, snapshot_id=snapshot_id, exception=e)
+
+        return snapshot_id
+
+    def dryrun_snapshot(self, project_id):
+        log.debug(f"would create snapshot on {project_id}")
+        record = self.make_snapshot_record(
+            snapshot_id="snapshot_id",
+            project_id=project_id,
+            timestamp=datetime.datetime.now(),
+            status="complete",
+        )
+        self.snapshots.append(record)
+        return "<snapshot ID>"
+
+    def log_snapshot(self, project_id, snapshot_id=None, exception=None):
+        if exception:
+            record = self.make_snapshot_record(
+                snapshot_id="",
+                project_id=project.get("_id"),
+                project_label=project.get("label"),
+                status="FAILED",
+                timestamp=datetime.datetime.now(),
+                message=str(exception),
+            )
+        else:
+            record = self.make_snapshot_record(snapshot_id, project_id)
+        self.snapshots.append(record)
 
     def make_snapshot_record(
         self,
@@ -75,7 +157,6 @@ class TriggerSnapshots:
         project_label: str = None,
         group_label: str = None,
         timestamp: datetime.datetime = None,
-        collection_label: str = None,
         status: str = "",
         message: str = "",
     ) -> SnapshotRecordItem:
@@ -87,29 +168,29 @@ class TriggerSnapshots:
             project_label: the label of the project
             group_label: the label of the group
             timestamp: the timestamp of the snapshot
-            collection_label: the label of the collection
             status: the status of the snapshot
             message: a message associated with the snapshot
 
         Returns:
             a SnapshotRecordItem object
         """
+        snapshot = snapshot_utils.get_snapshot(self.client, project_id, snapshot_id)
+
         if not snapshot_id:
             raise ValueError("no snapshot ID provided")
         if not project_id:
             raise ValueError("no project ID provided")
         project = None
         if not timestamp:
-            timestamp = datetime.datetime.now()
+            timestamp = self.get_formatted_snapshot_timestamp(snapshot)
         if not project_label:
-            project = self.client.get(f"/api/projects/{project_id}")
             project_label = project.get("label")
         if not group_label:
             if not project:
                 project = self.client.get(f"/api/projects/{project_id}")
             group_label = project.parents.group
-        if not collection_label:
-            collection_label = ""
+        if not status:
+            status = snapshot.status
 
         return SnapshotRecordItem(
             group_label=group_label,
@@ -117,83 +198,38 @@ class TriggerSnapshots:
             project_id=project_id,
             snapshot_id=snapshot_id,
             timestamp=timestamp,
-            collection_label=collection_label,
+            collection_label=self.collection_label,
             status=status,
             message=message,
         )
 
-    def make_snapshot_on_id(self, project_id: str) -> str:
-        """Make a snapshot on a project given a project ID
+    @staticmethod
+    def get_formatted_snapshot_timestamp(snapshot):
+        """Get a formatted timestamp from a snapshot"""
+        timestamp_datetime = snapshot_utils.get_snapshot_created_datetime(snapshot)
+        timestamp = datetime.strftime(timestamp_datetime, RECORD_TIMESTAMP_FORMAT)
+        return timestamp
 
-        Args:
-            project_id: the ID of the project
+    def update_snapshots(self):
+        """Fetches updates on the status of the snapshots in the snapshot list and updates them in place"""
 
-        Returns:
-            the ID of the snapshot
-        """
-        if self.dry_run:
-            log.debug(f"would create snapshot on {project_id}")
-            return "snapshot ID"
+        snapshots_to_update = [s for s in self.snapshots if s.status != "complete"]
+        for snapshot in snapshots_to_update:
+            snapshot_id = snapshot.snapshot_id
+            project_id = snapshot.project_id
+            refreshed_snapshot = snapshot_utils.get_snapshot(self.client, project_id, snapshot_id)
+            snapshot.status = refreshed_snapshot.status
 
-        log.debug(f"creating snapshot on {project_id}")
-        snapshot_id = snapshot_utils.make_snapshot(self.client, project_id)
-        return snapshot_id
+    def snapshots_are_finished(self):
+        """Returns True if all snapshots are finished, False otherwise"""
+        valid_endstates = ["complete", "failed"]
+        return all([s.status in valid_endstates for s in self.snapshots])
 
-    def find_projects_with_filter(self, project_filter: str) -> List[flywheel.Project]:
-        """Find projects with a filter
+    def save_snapshot_report(self, report_path):
+        """Saves the snapshot report to a CSV file"""
+        df = self.reports_to_df()
+        df.to_csv(report_path, index=False)
 
-        Args:
-            project_filter: the filter to use
-
-        Returns:
-            a list of projects
-        """
-        projects = self.client.get("/api/projects", params={"filter": project_filter})
-        log.debug(f"found {len(projects)} projects")
-        return projects
-
-    def trigger_snapshots_on_filter(
-        self, project_filter, collection_name=None
-    ) -> pd.DataFrame:
-        """Trigger snapshots on projects matching a filter
-
-        Args:
-            project_filter: the filter to use
-            collection_name: a name to give to this collection of snapshots
-
-        Returns:
-            a dataframe of snapshot records
-        """
-        if collection_name is None:
-            collection_name = ""
-        projects = self.find_projects_with_filter(project_filter)
-        snapshot_report = pd.DataFrame(
-            columns=SnapshotRecordItem.__dataclass_fields__.keys()
-        )
-
-        for project in projects:
-            try:
-                log.debug(f"Triggering snapshot on project {project.get('label')}")
-                snapshot_id = self.make_snapshot_on_project(project)
-                record = self.make_snapshot_record(
-                    snapshot_id,
-                    project.get("_id"),
-                    project.get("label"),
-                    collection_label=collection_name,
-                    status="SUCCESS",
-                )
-            except Exception as e:
-                record = self.make_snapshot_record(
-                    "",
-                    project.get("_id"),
-                    project.get("label"),
-                    collection_label=collection_name,
-                    status="FAILED",
-                    message=str(e),
-                )
-
-            snapshot_report = snapshot_report.append(
-                record.to_series, ignore_index=True
-            )
-
-        return snapshot_report
+    def reports_to_df(self):
+        """Converts the snapshot reports to a dataframe"""
+        return pd.DataFrame([s.to_series() for s in self.snapshots])
