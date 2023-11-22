@@ -36,7 +36,7 @@ class SnapshotRecord(BaseModel):
     parents: SnapshotParents = SnapshotParents(project="")
     group_label: str = ""
     project_label: str = ""
-    collection_label: str = ""
+    batch_label: str = ""
 
     def update(self, client) -> None:
         """Updates the snapshot status"""
@@ -55,7 +55,7 @@ class SnapshotRecord(BaseModel):
                 "project_id": self.parents.project,
                 "snapshot_id": self._id,
                 "timestamp": self.format_timestamp(),
-                "collection_label": self.collection_label,
+                "batch_label": self.batch_label,
                 "status": self.status,
             }
         )

@@ -16,8 +16,6 @@ import logging
 log = logging.getLogger("TriggerSnapshots")
 
 
-
-
 class Snapshotter:
     """A class for triggering snapshots on projects
 
@@ -93,18 +91,20 @@ class Snapshotter:
         Returns:
             the ID of the snapshot
         """
-        snapshot_id = None
-
         log.debug(f"creating snapshot on {project_id}")
         response = snapshot_utils.make_snapshot(self.client, project_id)
         self.log_snapshot(response)
         return response
 
-
     def log_snapshot(self, response):
-
         record = SnapshotRecord(**response)
-
+        project_id = record.parents.project
+        project = self.sdk_client.get_project(project_id)
+        project_label = project.label
+        group_label = project.group
+        record.project_label = project_label
+        record.group_label = group_label
+        record.batch_label = self.batch_name
         self.snapshots.append(record)
 
 
