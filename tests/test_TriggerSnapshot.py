@@ -13,7 +13,7 @@ def mock_client():
 def test_find_projects_with_filter(mock_client):
     """Test finding projects with a filter"""
 
-    snapshotter = TriggerSnapshot.TriggerSnapshots(client=mock_client)
+    snapshotter = TriggerSnapshot.Snapshotter(client=mock_client)
     mock_client.get.return_value = [
         {"label": "Test Project", "id": "test_project_id"}
     ]

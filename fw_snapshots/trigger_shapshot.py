@@ -41,7 +41,7 @@ class SnapshotRecordItem:
         )
 
 
-class TriggerSnapshots:
+class Snapshotter:
     """A class for triggering snapshots on projects
 
     Params:
