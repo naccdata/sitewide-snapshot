@@ -103,16 +103,6 @@ class Snapshotter:
 
         return snapshot_id
 
-    def dryrun_snapshot(self, project_id):
-        log.debug(f"would create snapshot on {project_id}")
-        record = self.make_snapshot_record(
-            snapshot_id="snapshot_id",
-            project_id=project_id,
-            timestamp=datetime.datetime.now(),
-            status="complete",
-        )
-        self.snapshots.append(record)
-        return "<snapshot ID>"
 
     def log_snapshot(self, project_id, snapshot_id=None, exception=None):
         if exception:
