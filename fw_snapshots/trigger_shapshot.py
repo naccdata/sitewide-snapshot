@@ -22,17 +22,15 @@ class Snapshotter:
 
     Params:
         client: a flywheel client
-        dry_run: if True, don't actually trigger snapshots
     """
 
-    def __init__(self, api_key: str, dry_run=False, batch_name=""):
+    def __init__(self, api_key: str, batch_name=""):
         self.snapshot_client = FWClient(
             api_key=api_key,
             client_name="Snapshotter",
             client_version="0.1",
         )
         self.sdk_client = flywheel.Client(api_key=api_key)
-        self.dry_run = dry_run
         self.batch_name = batch_name
         self.snapshots = []
 
@@ -95,8 +93,6 @@ class Snapshotter:
             the ID of the snapshot
         """
         snapshot_id = None
-        if self.dry_run:
-            snapshot_id = self.dryrun_snapshot(project_id)
 
         log.debug(f"creating snapshot on {project_id}")
         try:
