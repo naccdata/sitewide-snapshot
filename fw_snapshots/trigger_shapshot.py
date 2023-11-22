@@ -49,8 +49,13 @@ class Snapshotter:
         dry_run: if True, don't actually trigger snapshots
     """
 
-    def __init__(self, client: FWClient, dry_run = False, batch_name=""):
-        self.client = client
+    def __init__(self, api_key: str, dry_run=False, batch_name=""):
+        self.snapshot_client = FWClient(
+            api_key=api_key,
+            client_name="Snapshotter",
+            client_version="0.1",
+        )
+        self.sdk_client = flywheel.Client(api_key=api_key)
         self.dry_run = dry_run
         self.batch_name = batch_name
         self.snapshots = []
