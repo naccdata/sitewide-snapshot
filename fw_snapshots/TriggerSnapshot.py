@@ -12,6 +12,7 @@ import logging
 log = logging.getLogger("TriggerSnapshots")
 
 RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
+VALID_ENDSTATES = ["complete", "failed"]
 
 
 @dataclass
@@ -221,7 +222,7 @@ class TriggerSnapshots:
     def update_snapshots(self):
         """Fetches updates on the status of the snapshots in the snapshot list and updates them in place"""
 
-        snapshots_to_update = [s for s in self.snapshots if s.status != "complete"]
+        snapshots_to_update = [s for s in self.snapshots if s.status not in VALID_ENDSTATES]
         for snapshot in snapshots_to_update:
             snapshot_id = snapshot.snapshot_id
             project_id = snapshot.project_id
@@ -230,8 +231,8 @@ class TriggerSnapshots:
 
     def snapshots_are_finished(self):
         """Returns True if all snapshots are finished, False otherwise"""
-        valid_endstates = ["complete", "failed"]
-        return all([s.status in valid_endstates for s in self.snapshots])
+
+        return all([s.status in VALID_ENDSTATES for s in self.snapshots])
 
     def save_snapshot_report(self, report_path):
         """Saves the snapshot report to a CSV file"""
