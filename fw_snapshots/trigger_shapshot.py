@@ -67,12 +67,16 @@ class Snapshotter:
         Returns:
             the ID of the snapshot
         """
+        # If a string is provided, it's an ID or a lookup path
         if isinstance(project, str):
             if snapshot_utils.string_matches_id(project):
                 project_id = project
             else:
                 project = self.sdk_client.lookup(project)
                 project_id = project.get("_id")
+
+        # Otherwise it's an sdk project object or a FWClient project object,
+        # either way they should have the "_id" attribute
         else:
             project_id = project.get("_id")
 
