@@ -49,10 +49,10 @@ class TriggerSnapshots:
         dry_run: if True, don't actually trigger snapshots
     """
 
-    def __init__(self, client: FWClient, dry_run = False, collection_name=""):
+    def __init__(self, client: FWClient, dry_run = False, batch_name=""):
         self.client = client
         self.dry_run = dry_run
-        self.collection_name = collection_name
+        self.batch_name = batch_name
         self.snapshots = []
 
 
