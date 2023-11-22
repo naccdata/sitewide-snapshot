@@ -1,7 +1,10 @@
-import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass
 import pandas as pd
-from . import snapshot_utils
+#from . import snapshot_utils
+from pydantic import BaseModel, Field, root_validator, Extra
+from enum import Enum
+from typing import List, Optional
 
 import flywheel
 import fw_utils
@@ -11,34 +14,7 @@ import logging
 
 log = logging.getLogger("TriggerSnapshots")
 
-RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
-VALID_ENDSTATES = ["complete", "failed"]
 
-
-@dataclass
-class SnapshotRecordItem:
-    group_label: str
-    project_label: str
-    project_id: str
-    snapshot_id: str
-    timestamp: datetime.datetime
-    collection_label: str
-    status: str
-    message: str
-
-    def to_series(self):
-        return pd.Series(
-            {
-                "group_label": self.group_label,
-                "project_label": self.project_label,
-                "project_id": self.project_id,
-                "snapshot_id": self.snapshot_id,
-                "timestamp": self.timestamp,
-                "collection_label": self.collection_label,
-                "status": self.status,
-                "message": self.message,
-            }
-        )
 
 
 class Snapshotter:
@@ -95,7 +71,7 @@ class Snapshotter:
             if snapshot_utils.string_matches_id(project):
                 project_id = project
             else:
-                project = snapshot_utils.lookup_project(self.client, project)
+                project = self.sdk_client.lookup(project)
                 project_id = project.get("_id")
         else:
             project_id = project.get("_id")
@@ -161,7 +137,7 @@ class Snapshotter:
         timestamp: datetime.datetime = None,
         status: str = "",
         message: str = "",
-    ) -> SnapshotRecordItem:
+    ) -> Snapshot:
         """Make a SnapshotRecordItem object
 
         Args:
@@ -194,7 +170,7 @@ class Snapshotter:
         if not status:
             status = snapshot.status
 
-        return SnapshotRecordItem(
+        return Snapshot(
             group_label=group_label,
             project_label=project_label,
             project_id=project_id,
@@ -205,12 +181,7 @@ class Snapshotter:
             message=message,
         )
 
-    @staticmethod
-    def get_formatted_snapshot_timestamp(snapshot):
-        """Get a formatted timestamp from a snapshot"""
-        timestamp_datetime = snapshot_utils.get_snapshot_created_datetime(snapshot)
-        timestamp = datetime.strftime(timestamp_datetime, RECORD_TIMESTAMP_FORMAT)
-        return timestamp
+
 
     def update_snapshots(self):
         """Fetches updates on the status of the snapshots in the snapshot list and updates them in place"""

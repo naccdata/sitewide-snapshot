@@ -6,6 +6,63 @@ from fw_http_client.errors import NotFound
 
 CONTAINER_ID_FORMAT = "^[0-9a-fA-F]{24}$"
 SNAPSHOT_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
+RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
+
+
+class SnapshotState(str, Enum):
+    """The snapshot state"""
+
+    pending = "pending"
+    in_progress = "in_progress"
+    complete = "complete"
+    failed = "failed"
+
+    def is_final(self) -> bool:
+        """Helper that indicates whether or not this is a terminal state"""
+        return self in (SnapshotState.complete, SnapshotState.failed)
+
+
+class SnapshotParents(BaseModel):
+    """Parent references for snapshots"""
+    project: str
+
+
+class SnapshotRecord(BaseModel):
+    id: str = Field(alias="_id")
+    created: datetime = Field(default_factory=datetime.now(timezone.utc))
+    status: SnapshotState
+    parents: SnapshotParents
+    group_label: str
+    project_label: str
+    collection_label: str
+
+    def update(self, client) -> None:
+        """Updates the snapshot status"""
+        snapshot = client.get(f"/snapshot/projects/{self.parents.project}/snapshot/{self._id}")
+        self.status = snapshot.status
+
+    def is_final(self) -> bool:
+        """Helper that indicates whether or not this is a terminal state"""
+        return self.status.is_final()
+
+
+
+    def to_series(self):
+        return pd.Series(
+            {
+                "group_label": self.group_label,
+                "project_label": self.project_label,
+                "project_id": self.parents.project,
+                "snapshot_id": self._id,
+                "timestamp": self.format_timestamp(),
+                "collection_label": self.collection_label,
+                "status": self.status,
+            }
+        )
+
+    def format_timestamp(self):
+        """Get a formatted timestamp from a snapshot"""
+        return datetime.strftime(self.created, RECORD_TIMESTAMP_FORMAT)
 
 
 def string_matches_id(string: str) -> bool:
@@ -31,24 +88,6 @@ def make_snapshot(client: FWClient, project_id: str) -> str:
     return response["_id"]
 
 
-def lookup_project(client: FWClient, project_lookup_string: str) -> dict:
-    """looks up a project by group/label hierarchy format
-    Args:
-        client: a flywheel client
-        project_lookup_string: the string to lookup
-    Returns:
-        the project dict response from the flywheel API if found, None otherwise
-    """
-    endpoint = "/api/lookup"
-    body = {"path": project_lookup_string.split("/")}
-    try:
-        response = client.post(endpoint, json=body)
-    except NotFound:
-        log.error(f"Unable to find project {project_lookup_string}")
-        response = None
-    return response
-
-
 def get_snapshot(client: FWClient, project_id: str, snapshot_id: str) -> dict:
     """gets a snapshot from a project
     Args:
@@ -66,12 +105,3 @@ def get_snapshot(client: FWClient, project_id: str, snapshot_id: str) -> dict:
         response = None
     return response
 
-
-def get_snapshot_created_datetime(snapshot: dict) -> datetime:
-    """gets the created datetime from a snapshot
-    Args:
-        snapshot: the snapshot to get the created datetime from
-    Returns:
-        the created datetime of the snapshot
-    """
-    return datetime.strptime(snapshot["created"], SNAPSHOT_TIMESTAMP_FORMAT)
