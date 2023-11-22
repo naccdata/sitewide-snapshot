@@ -73,23 +73,11 @@ class Snapshotter:
         Returns:
             a dataframe of snapshot records
         """
-        projects = self.find_projects_with_filter(project_filter)
+        projects = self.sdk_client.projects.find(project_filter)
         for project in projects:
             log.debug(f"Triggering snapshot on project {project.get('label')}")
             _ = self.make_snapshot_on_project(project)
 
-    def find_projects_with_filter(self, project_filter: str) -> List[flywheel.Project]:
-        """Find projects with a filter
-
-        Args:
-            project_filter: the filter to use
-
-        Returns:
-            a list of projects
-        """
-        projects = self.client.get("/api/projects", params={"filter": project_filter})
-        log.debug(f"found {len(projects)} projects")
-        return projects
 
     def make_snapshot_on_project(
         self, project: Union[str, flywheel.Project, fw_utils.dicts.AttrDict]
