@@ -47,6 +47,10 @@ class SnapshotRecord(BaseModel):
         """Helper that indicates whether or not this is a terminal state"""
         return self.status.is_final()
 
+    def format_timestamp(self):
+        """Get a formatted timestamp from a snapshot"""
+        return datetime.datetime.strftime(self.created, RECORD_TIMESTAMP_FORMAT)
+
     def to_series(self):
         return pd.Series(
             {
@@ -59,10 +63,6 @@ class SnapshotRecord(BaseModel):
                 "status": self.status,
             }
         )
-
-    def format_timestamp(self):
-        """Get a formatted timestamp from a snapshot"""
-        return datetime.datetime.strftime(self.created, RECORD_TIMESTAMP_FORMAT)
 
 
 def string_matches_id(string: str) -> bool:

@@ -98,31 +98,23 @@ class Snapshotter:
 
     def log_snapshot(self, response):
         record = SnapshotRecord(**response)
+
         project_id = record.parents.project
         project = self.sdk_client.get_project(project_id)
-        project_label = project.label
-        group_label = project.group
-        record.project_label = project_label
-        record.group_label = group_label
+
+        record.project_label = project.label
+        record.group_label = project.group
         record.batch_label = self.batch_name
+
         self.snapshots.append(record)
-
-
 
     def update_snapshots(self):
         """Fetches updates on the status of the snapshots in the snapshot list and updates them in place"""
+        [s.update(self.snapshot_client) for s in self.snapshots if not s.is_final()]
 
-        snapshots_to_update = [s for s in self.snapshots if s.status not in VALID_ENDSTATES]
-        for snapshot in snapshots_to_update:
-            snapshot_id = snapshot.snapshot_id
-            project_id = snapshot.project_id
-            refreshed_snapshot = snapshot_utils.get_snapshot(self.client, project_id, snapshot_id)
-            snapshot.status = refreshed_snapshot.status
-
-    def snapshots_are_finished(self):
+    def is_finished(self):
         """Returns True if all snapshots are finished, False otherwise"""
-
-        return all([s.status in VALID_ENDSTATES for s in self.snapshots])
+        return all([s.is_final() for s in self.snapshots])
 
     def save_snapshot_report(self, report_path):
         """Saves the snapshot report to a CSV file"""
