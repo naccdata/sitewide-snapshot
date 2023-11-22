@@ -1,9 +1,10 @@
-from datetime.datetime import timezone
+from datetime import timezone
 import datetime
+import os
 
 from dataclasses import dataclass
 import pandas as pd
-#from . import snapshot_utils
+from . import snapshot_utils
 
 from typing import List, Optional
 
@@ -20,7 +21,7 @@ class Snapshotter:
     """A class for triggering snapshots on projects
 
     Params:
-        client: a flywheel client
+        api_key: a flywheel api key
     """
 
     def __init__(self, api_key: str, batch_name=""):
@@ -32,7 +33,6 @@ class Snapshotter:
         self.sdk_client = flywheel.Client(api_key=api_key)
         self.batch_name = batch_name
         self.snapshots = []
-
 
     def trigger_snapshots_on_filter(
         self,
@@ -50,7 +50,6 @@ class Snapshotter:
         for project in projects:
             log.debug(f"Triggering snapshot on project {project.get('label')}")
             _ = self.make_snapshot_on_project(project)
-
 
     def make_snapshot_on_project(
         self, project: Union[str, flywheel.Project, fw_utils.dicts.AttrDict]
@@ -92,12 +91,17 @@ class Snapshotter:
             the ID of the snapshot
         """
         log.debug(f"creating snapshot on {project_id}")
-        response = snapshot_utils.make_snapshot(self.client, project_id)
+        response = snapshot_utils.make_snapshot(self.snapshot_client, project_id)
         self.log_snapshot(response)
         return response
 
-    def log_snapshot(self, response):
-        record = SnapshotRecord(**response)
+    def log_snapshot(self, response: dict) -> None:
+        """Logs a snapshot response and adds it to the snapshot list
+        Args:
+            response: the response from the flywheel API
+        """
+
+        record = snapshot_utils.SnapshotRecord(**response)
 
         project_id = record.parents.project
         project = self.sdk_client.get_project(project_id)
@@ -108,20 +112,20 @@ class Snapshotter:
 
         self.snapshots.append(record)
 
-    def update_snapshots(self):
+    def update_snapshots(self) -> None:
         """Fetches updates on the status of the snapshots in the snapshot list and updates them in place"""
         [s.update(self.snapshot_client) for s in self.snapshots if not s.is_final()]
 
-    def is_finished(self):
+    def is_finished(self) -> bool:
         """Returns True if all snapshots are finished, False otherwise"""
         return all([s.is_final() for s in self.snapshots])
 
-    def save_snapshot_report(self, report_path):
+    def save_snapshot_report(self, report_path: os.PathLike) -> None:
         """Saves the snapshot report to a CSV file"""
         df = self.reports_to_df()
         df.to_csv(report_path, index=False)
 
-    def reports_to_df(self):
+    def reports_to_df(self) -> pd.DataFrame:
         """Converts the snapshot reports to a dataframe"""
         return pd.DataFrame([s.to_series() for s in self.snapshots])
 

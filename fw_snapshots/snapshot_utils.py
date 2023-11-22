@@ -5,11 +5,13 @@ from fw_client import FWClient
 from fw_http_client.errors import NotFound
 from pydantic import BaseModel, Field, root_validator, Extra
 from enum import Enum
+import logging
+import pandas as pd
 
 CONTAINER_ID_FORMAT = "^[0-9a-fA-F]{24}$"
 SNAPSHOT_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
 RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
-
+log=logging.getLogger("SnapshotUtils")
 
 class SnapshotState(str, Enum):
     """The snapshot state"""
@@ -40,8 +42,8 @@ class SnapshotRecord(BaseModel):
 
     def update(self, client) -> None:
         """Updates the snapshot status"""
-        snapshot = client.get(f"/snapshot/projects/{self.parents.project}/snapshot/{self._id}")
-        self.status = snapshot.status
+        snapshot = client.get(f"/snapshot/projects/{self.parents.project}/snapshots/{self.id}/detail")
+        self.status = SnapshotState(snapshot.status)
 
     def is_final(self) -> bool:
         """Helper that indicates whether or not this is a terminal state"""
@@ -57,7 +59,7 @@ class SnapshotRecord(BaseModel):
                 "group_label": self.group_label,
                 "project_label": self.project_label,
                 "project_id": self.parents.project,
-                "snapshot_id": self._id,
+                "snapshot_id": self.id,
                 "timestamp": self.format_timestamp(),
                 "batch_label": self.batch_label,
                 "status": self.status,
