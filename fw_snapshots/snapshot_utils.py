@@ -1,8 +1,10 @@
 import re
+from datetime import timezone
 import datetime
-
 from fw_client import FWClient
 from fw_http_client.errors import NotFound
+from pydantic import BaseModel, Field, root_validator, Extra
+from enum import Enum
 
 CONTAINER_ID_FORMAT = "^[0-9a-fA-F]{24}$"
 SNAPSHOT_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
@@ -29,12 +31,12 @@ class SnapshotParents(BaseModel):
 
 class SnapshotRecord(BaseModel):
     id: str = Field(alias="_id")
-    created: datetime = Field(default_factory=datetime.now(timezone.utc))
-    status: SnapshotState
-    parents: SnapshotParents
-    group_label: str
-    project_label: str
-    collection_label: str
+    created: datetime.datetime = datetime.datetime.now()
+    status: SnapshotState = SnapshotState.pending
+    parents: SnapshotParents = SnapshotParents(project="")
+    group_label: str = ""
+    project_label: str = ""
+    collection_label: str = ""
 
     def update(self, client) -> None:
         """Updates the snapshot status"""
@@ -44,8 +46,6 @@ class SnapshotRecord(BaseModel):
     def is_final(self) -> bool:
         """Helper that indicates whether or not this is a terminal state"""
         return self.status.is_final()
-
-
 
     def to_series(self):
         return pd.Series(
@@ -62,7 +62,7 @@ class SnapshotRecord(BaseModel):
 
     def format_timestamp(self):
         """Get a formatted timestamp from a snapshot"""
-        return datetime.strftime(self.created, RECORD_TIMESTAMP_FORMAT)
+        return datetime.datetime.strftime(self.created, RECORD_TIMESTAMP_FORMAT)
 
 
 def string_matches_id(string: str) -> bool:
@@ -84,8 +84,7 @@ def make_snapshot(client: FWClient, project_id: str) -> str:
         the ID of the snapshot
     """
     log.debug(f"creating snapshot on {project_id}")
-    response = client.post(f"/snapshot/projects/{project_id}/snapshots")
-    return response["_id"]
+    return client.post(f"/snapshot/projects/{project_id}/snapshots")
 
 
 def get_snapshot(client: FWClient, project_id: str, snapshot_id: str) -> dict:

@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime.datetime import timezone
+import datetime
+
 from dataclasses import dataclass
 import pandas as pd
 #from . import snapshot_utils
-from pydantic import BaseModel, Field, root_validator, Extra
-from enum import Enum
+
 from typing import List, Optional
 
 import flywheel
@@ -68,15 +69,15 @@ class Snapshotter:
         # If a string is provided, it's an ID or a lookup path
         if isinstance(project, str):
             if snapshot_utils.string_matches_id(project):
-                project_id = project
+                # Snapshots can be initiated on bogus project IDs as long as they're in the correct format.
+                # Ensure the project exists here by getting it
+                project = self.sdk_client.get_project(project)
             else:
                 project = self.sdk_client.lookup(project)
-                project_id = project.get("_id")
 
         # Otherwise it's an sdk project object or a FWClient project object,
         # either way they should have the "_id" attribute
-        else:
-            project_id = project.get("_id")
+        project_id = project.get("_id")
 
         if not project_id:
             raise ValueError(f"no project ID found for project {project}")
@@ -95,81 +96,16 @@ class Snapshotter:
         snapshot_id = None
 
         log.debug(f"creating snapshot on {project_id}")
-        try:
-            snapshot_id = snapshot_utils.make_snapshot(self.client, project_id)
-            self.log_snapshot(project_id, snapshot_id)
-        except Exception as e:
-            self.log_snapshot(project_id, snapshot_id=snapshot_id, exception=e)
-
-        return snapshot_id
+        response = snapshot_utils.make_snapshot(self.client, project_id)
+        self.log_snapshot(response)
+        return response
 
 
-    def log_snapshot(self, project_id, snapshot_id=None, exception=None):
-        if exception:
-            record = self.make_snapshot_record(
-                snapshot_id="",
-                project_id=project.get("_id"),
-                project_label=project.get("label"),
-                status="FAILED",
-                timestamp=datetime.datetime.now(),
-                message=str(exception),
-            )
-        else:
-            record = self.make_snapshot_record(snapshot_id, project_id)
+    def log_snapshot(self, response):
+
+        record = SnapshotRecord(**response)
+
         self.snapshots.append(record)
-
-    def make_snapshot_record(
-        self,
-        snapshot_id,
-        project_id,
-        project_label: str = None,
-        group_label: str = None,
-        timestamp: datetime.datetime = None,
-        status: str = "",
-        message: str = "",
-    ) -> Snapshot:
-        """Make a SnapshotRecordItem object
-
-        Args:
-            snapshot_id: the ID of the snapshot
-            project_id: the ID of the project
-            project_label: the label of the project
-            group_label: the label of the group
-            timestamp: the timestamp of the snapshot
-            status: the status of the snapshot
-            message: a message associated with the snapshot
-
-        Returns:
-            a SnapshotRecordItem object
-        """
-        snapshot = snapshot_utils.get_snapshot(self.client, project_id, snapshot_id)
-
-        if not snapshot_id:
-            raise ValueError("no snapshot ID provided")
-        if not project_id:
-            raise ValueError("no project ID provided")
-        project = None
-        if not timestamp:
-            timestamp = self.get_formatted_snapshot_timestamp(snapshot)
-        if not project_label:
-            project_label = project.get("label")
-        if not group_label:
-            if not project:
-                project = self.client.get(f"/api/projects/{project_id}")
-            group_label = project.parents.group
-        if not status:
-            status = snapshot.status
-
-        return Snapshot(
-            group_label=group_label,
-            project_label=project_label,
-            project_id=project_id,
-            snapshot_id=snapshot_id,
-            timestamp=timestamp,
-            collection_label=self.collection_label,
-            status=status,
-            message=message,
-        )
 
 
 
