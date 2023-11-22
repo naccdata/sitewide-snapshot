@@ -1,7 +1,15 @@
 import datetime
-
+from dataclasses import dataclass
 import pandas as pd
-import snapshot_utils
+from . import snapshot_utils
+
+import flywheel
+import fw_utils
+from fw_client import FWClient
+from typing import List, Union
+import logging
+
+log = logging.getLogger("TriggerSnapshots")
 
 RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
 
@@ -40,10 +48,10 @@ class TriggerSnapshots:
         dry_run: if True, don't actually trigger snapshots
     """
 
-    def __init__(self, client: FWClient):
+    def __init__(self, client: FWClient, dry_run = False, collection_name=""):
         self.client = client
-        self.dry_run = False
-        self.collection_name
+        self.dry_run = dry_run
+        self.collection_name = collection_name
         self.snapshots = []
 
 
@@ -78,7 +86,7 @@ class TriggerSnapshots:
         return projects
 
     def make_snapshot_on_project(
-        self, project: Union[str, flywheel.Project, fw_client.dicts.AttrDict]
+        self, project: Union[str, flywheel.Project, fw_utils.dicts.AttrDict]
     ) -> str:
         """Make a snapshot on a project
 
@@ -233,3 +241,4 @@ class TriggerSnapshots:
     def reports_to_df(self):
         """Converts the snapshot reports to a dataframe"""
         return pd.DataFrame([s.to_series() for s in self.snapshots])
+
