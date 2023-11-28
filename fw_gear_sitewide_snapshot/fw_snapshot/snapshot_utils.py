@@ -11,7 +11,17 @@ import pandas as pd
 CONTAINER_ID_FORMAT = "^[0-9a-fA-F]{24}$"
 SNAPSHOT_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
 RECORD_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M"
-log=logging.getLogger("SnapshotUtils")
+
+# Row names for the series that will be used to create the snapshot record dataframe
+GROUP_LABEL = "group_label"
+PROJECT_LABEL = "project_label"
+PROJECT_ID = "project_id"
+SNAPSHOT_ID = "snapshot_id"
+TIMESTAMP = "timestamp"
+BATCH_LABEL = "batch_label"
+STATUS = "status"
+
+log = logging.getLogger("SnapshotUtils")
 
 class SnapshotState(str, Enum):
     """The snapshot state"""
@@ -56,16 +66,15 @@ class SnapshotRecord(BaseModel):
     def to_series(self):
         return pd.Series(
             {
-                "group_label": self.group_label,
-                "project_label": self.project_label,
-                "project_id": self.parents.project,
-                "snapshot_id": self.id,
-                "timestamp": self.format_timestamp(),
-                "batch_label": self.batch_label,
-                "status": self.status,
+                GROUP_LABEL: self.group_label,
+                PROJECT_LABEL: self.project_label,
+                PROJECT_ID: self.parents.project,
+                SNAPSHOT_ID: self.id,
+                TIMESTAMP: self.format_timestamp(),
+                BATCH_LABEL: self.batch_label,
+                STATUS: self.status,
             }
         )
-
 
 def string_matches_id(string: str) -> bool:
     """determines if a string matches the flywheel ID format
