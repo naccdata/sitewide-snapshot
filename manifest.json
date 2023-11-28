@@ -33,6 +33,16 @@
     "api-key": {
       "base": "api-key",
       "read-only": false
+    },
+    "retry failed": {
+      "base": "file",
+      "description": "Retry failed snapshots in a report csv",
+      "optional": true,
+      "type": {
+        "enum": [
+          "tabular data"
+        ]
+      }
     }
   },
   "label": "Sitewide Snapshot",
