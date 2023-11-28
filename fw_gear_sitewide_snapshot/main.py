@@ -4,13 +4,14 @@ import logging
 import os
 from typing import Union
 import pandas as pd
+import time
 
 from fw_client import FWClient
 import utils
-from .fw_snapshot import snapshot_utils
+from .fw_snapshot import snapshot_utils, snapshot
 
 log = logging.getLogger(__name__)
-
+SNAPSHOT_TIMEOUT = 10 * 60 # ten min
 
 def process_report_for_retry(report_path: os.PathLike, client: FWClient) -> pd.DataFrame:
     df = pd.read_csv(report_path)
@@ -19,27 +20,33 @@ def process_report_for_retry(report_path: os.PathLike, client: FWClient) -> pd.D
     return df
 
 
-def run_snapshot_on_filter():
-    pass
 
 
-def run_snapshot_on_df(df: pd.DataFrame, api_key):
-    pass
 
-
-def run(api_key: str, project_filter: str, batch_name: str, retry_failed: Union[None, os.PathLike]) -> int:
+def run(api_key: str, project_filter: str, batch_name: str, output_file_path: os.PathLike, retry_failed: Union[None, os.PathLike]) -> int:
     """[summary]
 
     Returns:
         [type]: [description]
     """
 
+    snapshotter = snapshot.Snapshotter(api_key, batch_name)
+
     if retry_failed:
         client = utils.make_client(api_key)
         df_to_retry = process_report_for_retry(retry_failed, client)
-        run_snapshot_on_df(df_to_retry)
-        return 0
+        snapshotter.trigger_snapshots_on_dataframe(df_to_retry)
+    else:
+        snapshotter.trigger_snapshots_on_filter(project_filter)
 
-    run_snapshot_on_filter(api_key, project_filter, batch_name)
-    return 0
+    start = time.time()
+    return_state = 1
+    while time.time() - start < SNAPSHOT_TIMEOUT:
+        snapshotter.update_snapshots()
+        if snapshotter.is_finished():
+            return_state = 0
+        time.sleep(10)
+
+    snapshotter.save_snapshot_report(output_file_path)
+    return return_state
 

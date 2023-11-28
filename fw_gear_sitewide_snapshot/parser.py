@@ -19,5 +19,7 @@ def parse_config(
     batch_name = gear_context.config.get("snapshot batch name")
     retry_failed = gear_context.get_input_path("retry failed")
     api_key = utils.get_api_key(gear_context.config_json)
+    output_path = gear_context.output_dir
+    save_file_out = output_path / "snapshot_report.csv"
 
-    return debug, project_filter, batch_name, retry_failed, api_key
+    return debug, project_filter, batch_name, retry_failed, api_key, save_file_out

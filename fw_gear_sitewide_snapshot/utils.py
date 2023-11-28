@@ -25,6 +25,7 @@ def make_client(api_key):
         client_version="0.1",
     )
 
+
 def refresh_nonfailed_snapshots(snapshots: pd.DataFrame, client: FWClient) -> pd.DataFrame:
     rows_to_refresh = snapshots[~snapshots["status"].apply(is_final)].index
     for row_index in rows_to_refresh:

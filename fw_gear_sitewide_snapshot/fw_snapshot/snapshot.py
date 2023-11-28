@@ -49,7 +49,7 @@ class Snapshotter:
             )
 
         for row in df.iterrows():
-            project_id = row[1][snapshot_utils.PROJECT_ID]
+            project_id = snapshot_utils.SnapshotRecord.get_series_project(row[1])
             log.debug(f"Triggering snapshot {snapshot_id} on project {project_id}")
             _ = self.make_snapshot_on_id(project_id)
 
