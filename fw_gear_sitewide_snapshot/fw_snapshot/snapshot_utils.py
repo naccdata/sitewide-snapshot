@@ -66,6 +66,17 @@ class SnapshotRecord(BaseModel):
             }
         )
 
+    @classmethod
+    def from_series(cls, series: pd.Series):
+        new_snapshot = cls(id=series["snapshot_id"],
+                           created=datetime.datetime.strptime(series["timestamp"], RECORD_TIMESTAMP_FORMAT),
+                           status=series["status"],
+                           parents=SnapshotParents(project=series["project_id"]),
+                           group_label=series["group_label"],
+                           project_label=series["project_label"],
+                           batch_label=series["batch_label"])
+        return new_snapshot
+
 
 def string_matches_id(string: str) -> bool:
     """determines if a string matches the flywheel ID format
