@@ -4,6 +4,7 @@ from typing import Tuple
 import utils
 from flywheel_gear_toolkit import GearToolkitContext
 
+
 # This function mainly parses gear_context's config.json file and returns relevant
 # inputs and options.
 def parse_config(

@@ -1,5 +1,6 @@
 from fw_client import FWClient
 
+
 def get_api_key(config: dict) -> str:
     """Returns api-key value if present in config.json."""
     for inp in config["inputs"].values():
@@ -18,7 +19,9 @@ def filter_completed_and_failed_snapshots(snapshots: pd.DataFrame) -> pd.DataFra
     return snapshots
 
 
-def refresh_nonfailed_snapshots(snapshots: pd.DataFrame, client: FWClient) -> pd.DataFrame:
+def refresh_nonfailed_snapshots(
+    snapshots: pd.DataFrame, client: FWClient
+) -> pd.DataFrame:
     rows_to_refresh = snapshots[~snapshots["status"].apply(is_final)].index
     for row_index in rows_to_refresh:
         snapshot = snapshots.loc[row_index]

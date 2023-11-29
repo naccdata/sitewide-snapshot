@@ -1,18 +1,16 @@
-from datetime import timezone
 import datetime
+import logging
 import os
-
 from dataclasses import dataclass
-import pandas as pd
-from . import snapshot_utils
-
-from typing import List, Optional
+from datetime import timezone
+from typing import List, Optional, Union
 
 import flywheel
 import fw_utils
+import pandas as pd
 from fw_client import FWClient
-from typing import List, Union
-import logging
+
+from . import snapshot_utils
 
 log = logging.getLogger("TriggerSnapshots")
 
@@ -141,4 +139,3 @@ class Snapshotter:
     def reports_to_df(self) -> pd.DataFrame:
         """Converts the snapshot reports to a dataframe"""
         return pd.DataFrame([s.to_series() for s in self.snapshots])
-
