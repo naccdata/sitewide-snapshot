@@ -1,13 +1,12 @@
 import datetime
 import logging
 import re
-from datetime import timezone
 from enum import Enum
 
 import pandas as pd
 from fw_client import FWClient
 from fw_http_client.errors import NotFound
-from pydantic import BaseModel, Extra, Field, root_validator
+from pydantic import BaseModel, Field
 
 CONTAINER_ID_FORMAT = "^[0-9a-fA-F]{24}$"
 SNAPSHOT_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"

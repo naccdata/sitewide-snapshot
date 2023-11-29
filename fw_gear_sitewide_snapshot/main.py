@@ -6,10 +6,10 @@ import time
 from typing import Union
 
 import pandas as pd
-import utils
+from . import utils
 from fw_client import FWClient
 
-from .fw_snapshot import snapshot, snapshot_utils
+from .fw_snapshot import snapshot
 
 log = logging.getLogger(__name__)
 SNAPSHOT_TIMEOUT = 10 * 60  # ten min

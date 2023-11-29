@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "fw-gear-skeleton"
-version = "0.3.0"
-description = "{{description}}"
+name = "fw-gear-sitewide-snapshot"
+version = "0.0.1"
+description = "boop"
 authors = ["Flywheel <support@flywheel.io>"]
 readme = "README.md"
 license = "MIT"
@@ -15,9 +15,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 flywheel-gear-toolkit = "^0.6"
-flywheel-sdk = "^16.8.0"
+flywheel-sdk = "^16.16.0"
+fw-client = "^0.3.2"
+pandas = "^2.1.3"
+pydantic = "1.8.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"

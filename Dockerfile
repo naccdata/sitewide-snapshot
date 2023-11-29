@@ -1,10 +1,10 @@
-FROM python@sha256:d7da2b370dbb2f3f34bacc4aeec4ee52c22e7e49b41957a63acb91dcb2034980
+FROM python:3.9-slim-bullseye
 ENV FLYWHEEL="/flywheel/v0"
 WORKDIR ${FLYWHEEL}
 
 # Dev install. git for pip editable install.
 RUN apt-get update &&  \
-    apt-get install --no-install-recommends -y git=1:2.20.1-2+deb10u8 build-essential=12.6 && \
+    apt-get install --no-install-recommends -y git build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
