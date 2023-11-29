@@ -33,8 +33,7 @@ def run(api_key: str, project_filter: str, batch_name: str, output_file_path: os
     snapshotter = snapshot.Snapshotter(api_key, batch_name)
 
     if retry_failed:
-        client = utils.make_client(api_key)
-        df_to_retry = process_report_for_retry(retry_failed, client)
+        df_to_retry = process_report_for_retry(retry_failed, snapshotter.snapshot_client)
         snapshotter.trigger_snapshots_on_dataframe(df_to_retry)
     else:
         snapshotter.trigger_snapshots_on_filter(project_filter)

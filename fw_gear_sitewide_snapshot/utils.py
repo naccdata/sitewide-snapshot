@@ -18,14 +18,6 @@ def filter_completed_and_failed_snapshots(snapshots: pd.DataFrame) -> pd.DataFra
     return snapshots
 
 
-def make_client(api_key):
-    return FWClient(
-        api_key=api_key,
-        client_name="Snapshotter",
-        client_version="0.1",
-    )
-
-
 def refresh_nonfailed_snapshots(snapshots: pd.DataFrame, client: FWClient) -> pd.DataFrame:
     rows_to_refresh = snapshots[~snapshots["status"].apply(is_final)].index
     for row_index in rows_to_refresh:
