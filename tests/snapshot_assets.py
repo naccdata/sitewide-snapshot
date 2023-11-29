@@ -20,17 +20,22 @@ FAKE_RESPONSE = {
     "group_label": FAKE_GROUP,
     "project_label": FAKE_PROJECT_LABEL,
     "batch_label": FAKE_BATCH_NAME,
-    }
+}
 
 FAKE_RECORD = snapshot_utils.SnapshotRecord(**FAKE_RESPONSE)
+
 
 @pytest.fixture
 def mock_client():
     return MagicMock(spec=fw_client.FWClient)
 
+
 @pytest.fixture
 def mock_project():
-    return flywheel.Project(label=FAKE_PROJECT_LABEL, id=FAKE_PROJECT_ID, group=FAKE_GROUP)
+    return flywheel.Project(
+        label=FAKE_PROJECT_LABEL, id=FAKE_PROJECT_ID, group=FAKE_GROUP
+    )
+
 
 @pytest.fixture
 def mock_sdk_client(mock_project):

@@ -7,19 +7,32 @@ import pytest
 from mock import MagicMock, patch
 
 from ..fw_gear_sitewide_snapshot.fw_snapshot import snapshot, snapshot_utils
-from .snapshot_assets import (FAKE_BATCH_NAME, FAKE_DATE, FAKE_GROUP, FAKE_KEY,
-                              FAKE_PROJECT_ID, FAKE_PROJECT_LABEL,
-                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client,
-                              mock_project, mock_sdk_client)
+from .snapshot_assets import (
+    FAKE_BATCH_NAME,
+    FAKE_DATE,
+    FAKE_GROUP,
+    FAKE_KEY,
+    FAKE_PROJECT_ID,
+    FAKE_PROJECT_LABEL,
+    FAKE_RESPONSE,
+    FAKE_SNAPSHOT_ID,
+    mock_client,
+    mock_project,
+    mock_sdk_client,
+)
 
 
 @pytest.fixture
 def mock_client():
     return MagicMock(spec=fw_client.FWClient)
 
+
 @pytest.fixture
 def mock_project():
-    return flywheel.Project(label=FAKE_PROJECT_LABEL, id=FAKE_PROJECT_ID, group=FAKE_GROUP)
+    return flywheel.Project(
+        label=FAKE_PROJECT_LABEL, id=FAKE_PROJECT_ID, group=FAKE_GROUP
+    )
+
 
 @pytest.fixture
 def mock_sdk_client(mock_project):
@@ -96,7 +109,9 @@ def test_make_snapshot_on_id(mock_client, mock_sdk_client):
     response = snapshotter.make_snapshot_on_id(FAKE_PROJECT_ID)
 
     assert snapshot.snapshot_utils.make_snapshot.call_count == 1
-    snapshot.snapshot_utils.make_snapshot.assert_called_with(mock_client, FAKE_PROJECT_ID)
+    snapshot.snapshot_utils.make_snapshot.assert_called_with(
+        mock_client, FAKE_PROJECT_ID
+    )
     snapshotter.log_snapshot.assert_called_with(FAKE_RESPONSE)
     assert response == FAKE_RESPONSE
 
@@ -110,5 +125,3 @@ def test_log_snapshot(mock_client, mock_sdk_client):
     snapshotter.log_snapshot(FAKE_RESPONSE)
     assert snapshotter.snapshots == [record]
     snapshotter.sdk_client.get_project.assert_called_with(FAKE_PROJECT_ID)
-
-

@@ -26,7 +26,9 @@ def main(context: GearToolkitContext) -> None:  # pragma: no cover
 
     # Call parse_config to extract the args, kwargs from the context
     # (e.g. config.json).
-    project_filter, batch_name, retry_failed, api_key, output_file_path = parse_config(context)
+    project_filter, batch_name, retry_failed, api_key, output_file_path = parse_config(
+        context
+    )
 
     # Pass the args, kwargs to fw_gear_skeleton.main.run function to execute
     # the main functionality of the gear.
