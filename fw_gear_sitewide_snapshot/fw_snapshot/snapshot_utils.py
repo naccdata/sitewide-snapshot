@@ -76,35 +76,6 @@ class SnapshotRecord(BaseModel):
             }
         )
 
-    @classmethod
-    def from_series(cls, series: pd.Series):
-        new_snapshot = cls(id=series.get(SNAPSHOT_ID, ""),
-                           created=cls.get_series_timestamp(series),
-                           status=cls.get_series_status(series),
-                           parents=cls.get_series_project(series),
-                           group_label=series.get(GROUP_LABEL),
-                           project_label=series.get(PROJECT_LABEL),
-                           batch_label=series.get(BATCH_LABEL))
-        return new_snapshot
-
-    @staticmethod
-    def get_series_timestamp(series: pd.Series):
-        if TIMESTAMP in series:
-            return datetime.datetime.strptime(series.get(TIMESTAMP), RECORD_TIMESTAMP_FORMAT)
-        return datetime.datetime.now()
-
-    @staticmethod
-    def get_series_status(series: pd.Series):
-        if STATUS in series:
-            return SnapshotState(series.get(STATUS))
-        return SnapshotState.pending
-
-    @staticmethod
-    def get_series_project(series: pd.Series):
-        if PROJECT_ID in series:
-            return SnapshotParents(project=series.get(PROJECT_ID))
-        return SnapshotParents(project="")
-
 
 def string_matches_id(string: str) -> bool:
     """determines if a string matches the flywheel ID format

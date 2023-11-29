@@ -34,23 +34,17 @@ class Snapshotter:
         self.batch_name = batch_name
         self.snapshots = []
 
-    def trigger_snapshots_on_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+    def trigger_snapshots_on_list(self, projects: List) -> pd.DataFrame:
         """Trigger snapshots on a dataframe of projects
 
         Args:
-            df: a dataframe of projects
+            projects: a list of project ids
 
         Returns:
             a dataframe of snapshot records
         """
-        if snapshot_utils.PROJECT_ID not in df:
-            raise ValueError(
-                f"project dataframe must have columns {snapshot_utils.PROJECT_ID} for project ID"
-            )
-
-        for row in df.iterrows():
-            project_id = snapshot_utils.SnapshotRecord.get_series_project(row[1])
-            log.debug(f"Triggering snapshot {snapshot_id} on project {project_id}")
+        for project_id in projects:
+            log.debug(f"Triggering snapshot on project {project_id}")
             _ = self.make_snapshot_on_id(project_id)
 
     def trigger_snapshots_on_filter(
