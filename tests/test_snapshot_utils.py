@@ -7,10 +7,20 @@ import pytest
 from mock import MagicMock, patch
 
 from ..fw_gear_sitewide_snapshot.fw_snapshot import snapshot_utils
-from .snapshot_assets import (FAKE_BATCH_NAME, FAKE_DATE, FAKE_GROUP, FAKE_KEY,
-                              FAKE_PROJECT_ID, FAKE_PROJECT_LABEL, FAKE_RECORD,
-                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client,
-                              mock_project, mock_sdk_client)
+from .snapshot_assets import (
+    FAKE_BATCH_NAME,
+    FAKE_DATE,
+    FAKE_GROUP,
+    FAKE_KEY,
+    FAKE_PROJECT_ID,
+    FAKE_PROJECT_LABEL,
+    FAKE_RECORD,
+    FAKE_RESPONSE,
+    FAKE_SNAPSHOT_ID,
+    mock_client,
+    mock_project,
+    mock_sdk_client,
+)
 
 
 def test_SnapshotRecord_update(mock_client):
@@ -26,7 +36,9 @@ def test_SnapshotRecord_update(mock_client):
     assert update_response.status == snapshot_utils.SnapshotState.complete
     record = snapshot_utils.SnapshotRecord(**FAKE_RESPONSE)
     record.update(mock_client)
-    mock_client.get.assert_called_with(f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots/{FAKE_SNAPSHOT_ID}/detail")
+    mock_client.get.assert_called_with(
+        f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots/{FAKE_SNAPSHOT_ID}/detail"
+    )
 
 
 def test_SnapshotRecord_is_final():
@@ -55,14 +67,18 @@ def test_make_snapshot(mock_client):
     """Test making a snapshot"""
     snapshot_utils.make_snapshot(client=mock_client, project_id=FAKE_PROJECT_ID)
     mock_client.post.assert_called_with(
-        f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots")
+        f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots"
+    )
 
 
 def test_get_snapshot(mock_client):
     """Test getting a snapshot"""
     mock_client.get.return_value = FAKE_RESPONSE
-    response = snapshot_utils.get_snapshot(client=mock_client, project_id=FAKE_PROJECT_ID, snapshot_id=FAKE_SNAPSHOT_ID)
+    response = snapshot_utils.get_snapshot(
+        client=mock_client, project_id=FAKE_PROJECT_ID, snapshot_id=FAKE_SNAPSHOT_ID
+    )
     mock_client.get.assert_called_with(
-        f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots/{FAKE_SNAPSHOT_ID}")
+        f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots/{FAKE_SNAPSHOT_ID}"
+    )
 
     assert response == FAKE_RESPONSE

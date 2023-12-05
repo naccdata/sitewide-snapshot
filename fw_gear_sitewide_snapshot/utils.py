@@ -2,6 +2,7 @@ from fw_client import FWClient
 from .fw_snapshot import snapshot_utils
 import pandas as pd
 
+
 def get_api_key(config: dict) -> str:
     """Returns api-key value if present in config.json."""
     for inp in config["inputs"].values():
