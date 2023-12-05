@@ -30,7 +30,7 @@ class Snapshotter:
         self.snapshots = []
 
     def trigger_snapshots_on_list(self, projects: List) -> pd.DataFrame:
-        """Trigger snapshots on a dataframe of projects
+        """Trigger snapshots on a list of project ids
 
         Args:
             projects: a list of project ids
