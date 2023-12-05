@@ -21,7 +21,7 @@ def parse_config(
         api_key (str): Flywheel API key
         save_file_out (str): Output path for the snapshot report
 
-        """
+    """
 
     project_filter = gear_context.config.get("project filter")
     batch_name = gear_context.config.get("snapshot batch name")
