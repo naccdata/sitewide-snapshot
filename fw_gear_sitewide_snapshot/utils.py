@@ -1,4 +1,5 @@
 from fw_client import FWClient
+from .fw_snapshot import snapshot_utils
 import pandas as pd
 
 def get_api_key(config: dict) -> str:
@@ -27,5 +28,5 @@ def refresh_nonfailed_snapshots(
         snapshot = snapshots.loc[row_index]
         snapshot_record = snapshot_utils.SnapshotRecord.from_series(snapshot)
         snapshot_record.update(client)
-        shapshots.loc[row_index, "status"] = snapshot_record.status
+        snapshots.loc[row_index, "status"] = snapshot_record.status
     return snapshots
