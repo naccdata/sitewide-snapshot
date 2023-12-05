@@ -1,6 +1,6 @@
 """Parser module to parse gear config.json."""
-from typing import Tuple
 
+import os
 import utils
 from flywheel_gear_toolkit import GearToolkitContext
 
@@ -9,12 +9,19 @@ from flywheel_gear_toolkit import GearToolkitContext
 # inputs and options.
 def parse_config(
     gear_context: GearToolkitContext,
-) -> Tuple[str, str]:
-    """[Summary]
+) -> (str, str, os.Pathlike, str, str):
+    """Parses necessary items out of the context object
 
+    Args:
+        gear_context (GearToolkitContext): The gear context object
     Returns:
-        [type]: [description]
-    """
+        project_filter (str): The project filter
+        batch_name (str): The snapshot batch name
+        retry_failed (os.Pathlike): Path of previous gear output report to retry failed snapshots on
+        api_key (str): Flywheel API key
+        save_file_out (str): Output path for the snapshot report
+
+        """
 
     project_filter = gear_context.config.get("project filter")
     batch_name = gear_context.config.get("snapshot batch name")
@@ -23,4 +30,4 @@ def parse_config(
     output_path = gear_context.output_dir
     save_file_out = output_path / "snapshot_report.csv"
 
-    return debug, project_filter, batch_name, retry_failed, api_key, save_file_out
+    return project_filter, batch_name, retry_failed, api_key, save_file_out
