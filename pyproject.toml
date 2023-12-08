@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fw-gear-sitewide-snapshot"
+name = "fw_gear_sitewide_snapshot"
 version = "0.0.1"
 description = "boop"
 authors = ["Flywheel <support@flywheel.io>"]
