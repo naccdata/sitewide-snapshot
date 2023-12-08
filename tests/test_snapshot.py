@@ -5,7 +5,7 @@ import fw_client
 import pytest
 from unittest.mock import MagicMock, patch
 
-from ..fw_gear_sitewide_snapshot.snapshot import snapshot, snapshot_utils
+from ..fw_gear_sitewide_snapshot.snapshot import snapshot
 from .snapshot_assets import (FAKE_BATCH_NAME, FAKE_DATE, FAKE_GROUP, FAKE_KEY,
                               FAKE_PROJECT_ID, FAKE_PROJECT_LABEL,
                               FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client, mock_sdk_client, mock_project
@@ -83,20 +83,20 @@ def test_make_snapshot_on_id(patch_client, patch_sdk_client, mock_client, mock_s
     patch_client.return_value = mock_client
     patch_sdk_client.return_value = mock_sdk_client
 
-    snapshotter = snapshot.Snapshotter(api_key=FAKE_KEY)
-    snapshotter.sdk_client = mock_sdk_client
-    snapshotter.snapshot_client = mock_client
-    snapshotter.log_snapshot = MagicMock()
-    snapshot.snapshot_utils.make_snapshot = MagicMock(return_value=FAKE_RESPONSE)
+    with patch("sitewide_snapshot.fw_gear_sitewide_snapshot.snapshot.snapshot_utils.make_snapshot") as util_mock:
+        util_mock.return_value = FAKE_RESPONSE
+        snapshotter = snapshot.Snapshotter(api_key=FAKE_KEY)
+        snapshotter.sdk_client = mock_sdk_client
+        snapshotter.snapshot_client = mock_client
+        snapshotter.log_snapshot = MagicMock()
+        response = snapshotter.make_snapshot_on_id(FAKE_PROJECT_ID)
 
-    response = snapshotter.make_snapshot_on_id(FAKE_PROJECT_ID)
-
-    assert snapshot.snapshot_utils.make_snapshot.call_count == 1
-    snapshot.snapshot_utils.make_snapshot.assert_called_with(
+        assert snapshot.snapshot_utils.make_snapshot.call_count == 1
+        snapshot.snapshot_utils.make_snapshot.assert_called_with(
         mock_client, FAKE_PROJECT_ID
     )
-    snapshotter.log_snapshot.assert_called_with(FAKE_RESPONSE)
-    assert response == FAKE_RESPONSE
+        snapshotter.log_snapshot.assert_called_with(FAKE_RESPONSE)
+        assert response == FAKE_RESPONSE
 
 
 @patch("fw_client.FWClient")

@@ -47,11 +47,6 @@ def test_string_matches_id():
 def test_make_snapshot(mock_client):
     """Test making a snapshot"""
     snapshot_utils.make_snapshot(client=mock_client, project_id=FAKE_PROJECT_ID)
-    #mock_client.post(f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots")
-    print(mock_client)
-    print(mock_client.mock_calls)
-    print(mock_client.post.mock_calls)
-    assert False
     mock_client.post.assert_called_with(
         f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots"
     )
