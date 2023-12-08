@@ -1,12 +1,13 @@
-import re
-from datetime import timezone
 import datetime
+import logging
+import re
+from enum import Enum
+
+import pandas as pd
 from fw_client import FWClient
 from fw_http_client.errors import NotFound
-from pydantic import BaseModel, Field, root_validator, Extra
-from enum import Enum
-import logging
-import pandas as pd
+from pydantic import BaseModel, Field
+from requests import Response
 
 CONTAINER_ID_FORMAT = "^[0-9a-fA-F]{24}$"
 SNAPSHOT_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
@@ -23,6 +24,7 @@ STATUS = "status"
 
 log = logging.getLogger("SnapshotUtils")
 
+
 class SnapshotState(str, Enum):
     """The snapshot state"""
 
@@ -38,6 +40,7 @@ class SnapshotState(str, Enum):
 
 class SnapshotParents(BaseModel):
     """Parent references for snapshots"""
+
     project: str
 
 
@@ -52,7 +55,9 @@ class SnapshotRecord(BaseModel):
 
     def update(self, client) -> None:
         """Updates the snapshot status"""
-        snapshot = client.get(f"/snapshot/projects/{self.parents.project}/snapshots/{self.id}/detail")
+        snapshot = client.get(
+            f"/snapshot/projects/{self.parents.project}/snapshots/{self.id}/detail"
+        )
         self.status = SnapshotState(snapshot.status)
 
     def is_final(self) -> bool:
@@ -76,6 +81,7 @@ class SnapshotRecord(BaseModel):
             }
         )
 
+
 def string_matches_id(string: str) -> bool:
     """determines if a string matches the flywheel ID format
     Args:
@@ -86,7 +92,7 @@ def string_matches_id(string: str) -> bool:
     return True if re.fullmatch(CONTAINER_ID_FORMAT, string) else False
 
 
-def make_snapshot(client: FWClient, project_id: str) -> str:
+def make_snapshot(client: FWClient, project_id: str) -> Response:
     """makes a snapshot on a project
     Args:
         client: a flywheel client
@@ -114,4 +120,3 @@ def get_snapshot(client: FWClient, project_id: str, snapshot_id: str) -> dict:
         log.error(f"Unable to find snapshot {snapshot_id} on project {project_id}")
         response = None
     return response
-
