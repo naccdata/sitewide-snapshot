@@ -6,9 +6,9 @@ import time
 from typing import Union
 
 import pandas as pd
-from . import utils
 from fw_client import FWClient
 
+from . import utils
 from .snapshot import snapshot
 
 log = logging.getLogger(__name__)

@@ -1,9 +1,11 @@
-import pytest
-from mock import patch, MagicMock
 import datetime
-from ..fw_gear_sitewide_snapshot.snapshot import snapshot_utils
-import fw_client
+
 import flywheel
+import fw_client
+import pytest
+from mock import MagicMock, patch
+
+from ..fw_gear_sitewide_snapshot.snapshot import snapshot_utils
 
 FAKE_KEY = "latest.sse.flywheel.io:1234"
 FAKE_PROJECT_ID = "123456789abc123456789abc"

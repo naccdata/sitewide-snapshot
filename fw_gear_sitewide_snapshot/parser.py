@@ -1,6 +1,7 @@
 """Parser module to parse gear config.json."""
 
 import os
+
 import utils
 from flywheel_gear_toolkit import GearToolkitContext
 
