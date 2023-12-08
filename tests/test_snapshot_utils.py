@@ -1,7 +1,12 @@
-
 from ..fw_gear_sitewide_snapshot.snapshot import snapshot_utils
-from .snapshot_assets import (FAKE_PROJECT_ID,
-                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client, mock_sdk_client, mock_project)
+from .snapshot_assets import (
+    FAKE_PROJECT_ID,
+    FAKE_RESPONSE,
+    FAKE_SNAPSHOT_ID,
+    mock_client,
+    mock_project,
+    mock_sdk_client,
+)
 
 
 def test_SnapshotRecord_update(mock_client):
