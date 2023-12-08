@@ -12,18 +12,19 @@
       "description": "A finder filter to use to select projects to include in the snapshot ('label=mylabel', 'group=mygroup', etc).  Will snapshot ALL matching projects.  If you want all projects snapshotted, enter 'ALL'",
       "type": "string"
     },
-    "snapshot name": {
-      "description": "A name to associate with this collection of snapshots",
+    "snapshot batch name": {
+      "description": "A name to associate with this batch of snapshots",
       "type": "string"
-    },
+    }
+  },
   "custom": {
     "flywheel": {
-      "suite": "FW-Templates",
+      "suite": "Export",
       "show-job": true
     },
     "gear-builder": {
       "category": "utility",
-      "image": "flywheel/sitewide_snapshot:0.0.1"
+      "image": "flywheel/sitewide-snapshot:0.0.1"
     }
   },
   "description": "Triggers a site-wide snapshot based off a provided filter",
@@ -37,7 +38,7 @@
   "label": "Sitewide Snapshot",
   "license": "Other",
   "maintainer": "Flywheel <support@flywheel.io>",
-  "name": "sitewide_snapshot",
+  "name": "sitewide-snapshot",
   "source": "https://gitlab.com/flywheel-io/scientific-solutions/etc/utlis/skeleton",
   "url": "https://gitlab.com/flywheel-io/scientific-solutions/etc/utlis/skeleton",
   "version": "0.0.1"
