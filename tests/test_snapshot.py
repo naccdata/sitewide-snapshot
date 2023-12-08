@@ -2,43 +2,25 @@ import datetime
 
 import flywheel
 import fw_client
-import mock
 import pytest
-from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from ..fw_gear_sitewide_snapshot.snapshot import snapshot, snapshot_utils
 from .snapshot_assets import (FAKE_BATCH_NAME, FAKE_DATE, FAKE_GROUP, FAKE_KEY,
                               FAKE_PROJECT_ID, FAKE_PROJECT_LABEL,
-                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client,
-                              mock_project, mock_sdk_client)
+                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client, mock_sdk_client, mock_project
+                              )
 
 
-@pytest.fixture
-def mock_client():
-    return MagicMock(spec=fw_client.FWClient)
-
-
-@pytest.fixture
-def mock_project():
-    return flywheel.Project(
-        label=FAKE_PROJECT_LABEL, id=FAKE_PROJECT_ID, group=FAKE_GROUP
-    )
-
-
-@pytest.fixture
-def mock_sdk_client(mock_project):
-    sdk_client = MagicMock(spc=flywheel.Client)
-    sdk_client.get_project.return_value = mock_project
-    sdk_client.lookup.return_value = mock_project
-    sdk_client.projects.find.return_value = [mock_project]
-    return sdk_client
-
-
-def test_trigger_snapshots_on_filter(mock_client, mock_sdk_client, mock_project):
+@patch("fw_client.FWClient")
+@patch("flywheel.Client")
+def test_trigger_snapshots_on_filter(patch_client, patch_sdk_client, mock_client, mock_sdk_client, mock_project):
     """Test finding projects with a filter"""
+    patch_client.return_value = mock_client
+    patch_sdk_client.return_value = mock_sdk_client
+
     snapshotter = snapshot.Snapshotter(api_key=FAKE_KEY)
     snapshotter.sdk_client = mock_sdk_client
-    snapshotter.snapshot_client = mock_client
     snapshotter.make_snapshot_on_project = MagicMock()
 
     test_filter = "label=Test Project"
@@ -48,7 +30,12 @@ def test_trigger_snapshots_on_filter(mock_client, mock_sdk_client, mock_project)
     snapshotter.make_snapshot_on_project.assert_called_with(mock_project)
 
 
-def test_make_snapshot_on_project(mock_client, mock_sdk_client, mock_project):
+@patch("fw_client.FWClient")
+@patch("flywheel.Client")
+def test_make_snapshot_on_project(patch_client, patch_sdk_client, mock_client, mock_sdk_client, mock_project):
+    patch_client.return_value = mock_client
+    patch_sdk_client.return_value = mock_sdk_client
+
     snapshotter = snapshot.Snapshotter(api_key=FAKE_KEY)
     snapshotter.sdk_client = mock_sdk_client
     snapshotter.snapshot_client = mock_client
@@ -90,7 +77,12 @@ def test_make_snapshot_on_project(mock_client, mock_sdk_client, mock_project):
     assert snapshotter.make_snapshot_on_id.call_count == 3
 
 
-def test_make_snapshot_on_id(mock_client, mock_sdk_client):
+@patch("fw_client.FWClient")
+@patch("flywheel.Client")
+def test_make_snapshot_on_id(patch_client, patch_sdk_client, mock_client, mock_sdk_client):
+    patch_client.return_value = mock_client
+    patch_sdk_client.return_value = mock_sdk_client
+
     snapshotter = snapshot.Snapshotter(api_key=FAKE_KEY)
     snapshotter.sdk_client = mock_sdk_client
     snapshotter.snapshot_client = mock_client
@@ -107,7 +99,12 @@ def test_make_snapshot_on_id(mock_client, mock_sdk_client):
     assert response == FAKE_RESPONSE
 
 
-def test_log_snapshot(mock_client, mock_sdk_client):
+@patch("fw_client.FWClient")
+@patch("flywheel.Client")
+def test_log_snapshot(patch_client, patch_sdk_client, mock_client, mock_sdk_client):
+    patch_client.return_value = mock_client
+    patch_sdk_client.return_value = mock_sdk_client
+
     snapshotter = snapshot.Snapshotter(api_key=FAKE_KEY)
     snapshotter.sdk_client = mock_sdk_client
     snapshotter.snapshot_client = mock_client

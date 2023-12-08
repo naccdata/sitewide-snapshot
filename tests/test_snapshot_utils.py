@@ -1,16 +1,7 @@
-import datetime
-
-import flywheel
-import fw_client
-import mock
-import pytest
-from mock import MagicMock, patch
 
 from ..fw_gear_sitewide_snapshot.snapshot import snapshot_utils
-from .snapshot_assets import (FAKE_BATCH_NAME, FAKE_DATE, FAKE_GROUP, FAKE_KEY,
-                              FAKE_PROJECT_ID, FAKE_PROJECT_LABEL, FAKE_RECORD,
-                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client,
-                              mock_project, mock_sdk_client)
+from .snapshot_assets import (FAKE_PROJECT_ID,
+                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client, mock_sdk_client, mock_project)
 
 
 def test_SnapshotRecord_update(mock_client):
@@ -56,6 +47,11 @@ def test_string_matches_id():
 def test_make_snapshot(mock_client):
     """Test making a snapshot"""
     snapshot_utils.make_snapshot(client=mock_client, project_id=FAKE_PROJECT_ID)
+    #mock_client.post(f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots")
+    print(mock_client)
+    print(mock_client.mock_calls)
+    print(mock_client.post.mock_calls)
+    assert False
     mock_client.post.assert_called_with(
         f"/snapshot/projects/{FAKE_PROJECT_ID}/snapshots"
     )
