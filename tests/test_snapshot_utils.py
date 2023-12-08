@@ -6,7 +6,7 @@ import mock
 import pytest
 from mock import MagicMock, patch
 
-from ..fw_gear_sitewide_snapshot.fw_snapshot import snapshot_utils
+from ..fw_gear_sitewide_snapshot.snapshot import snapshot_utils
 from .snapshot_assets import (
     FAKE_BATCH_NAME,
     FAKE_DATE,

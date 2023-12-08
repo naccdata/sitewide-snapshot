@@ -1,5 +1,5 @@
 from fw_client import FWClient
-from .fw_snapshot import snapshot_utils
+from .snapshot import snapshot_utils
 import pandas as pd
 
 

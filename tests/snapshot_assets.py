@@ -1,7 +1,7 @@
 import pytest
 from mock import patch, MagicMock
 import datetime
-from ..fw_gear_sitewide_snapshot.fw_snapshot import snapshot_utils
+from ..fw_gear_sitewide_snapshot.snapshot import snapshot_utils
 import fw_client
 import flywheel
 

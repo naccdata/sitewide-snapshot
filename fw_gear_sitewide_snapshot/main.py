@@ -9,7 +9,7 @@ import pandas as pd
 from . import utils
 from fw_client import FWClient
 
-from .fw_snapshot import snapshot
+from .snapshot import snapshot
 
 log = logging.getLogger(__name__)
 SNAPSHOT_TIMEOUT = 10 * 60  # ten min
