@@ -103,6 +103,7 @@ def make_snapshot(client: FWClient, project_id: str) -> Response:
     log.debug(f"creating snapshot on {project_id}")
     return client.post(f"/snapshot/projects/{project_id}/snapshots")
 
+
 def get_snapshot(client: FWClient, project_id: str, snapshot_id: str) -> dict:
     """gets a snapshot from a project
     Args:
