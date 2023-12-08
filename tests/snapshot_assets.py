@@ -1,13 +1,15 @@
 import datetime
+from unittest.mock import MagicMock, patch
 
 import flywheel
 import fw_client
 import pytest
-from unittest.mock import MagicMock, patch
 
 from fw_gear_sitewide_snapshot.snapshot import snapshot_utils
 
-FAKE_KEY = "latest.sse.flywheel.io:abCdEf1GHI2J3Klmn4oPqrST5uv67WxyzA8bCd9ef0ghijKlmn1OpQrST"
+FAKE_KEY = (
+    "latest.sse.flywheel.io:abCdEf1GHI2J3Klmn4oPqrST5uv67WxyzA8bCd9ef0ghijKlmn1OpQrST"
+)
 FAKE_PROJECT_ID = "123456789abc123456789abc"
 FAKE_SNAPSHOT_ID = "snapshot_id"
 FAKE_PROJECT_LABEL = "project label"
