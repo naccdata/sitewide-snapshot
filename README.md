@@ -27,7 +27,7 @@ Triggers a site-wide snapshot based off a provided filter
 
 ### Inputs
 
-- *{retry failed}*
+- *retry failed*
   - __Name__: *retry failed*
   - __Type__: *file*
   - __Optional__: *True*
