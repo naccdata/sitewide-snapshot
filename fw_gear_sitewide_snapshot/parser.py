@@ -2,7 +2,7 @@
 
 import os
 
-import utils
+from . import utils
 from flywheel_gear_toolkit import GearToolkitContext
 
 
