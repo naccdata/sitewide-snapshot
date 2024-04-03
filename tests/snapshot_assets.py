@@ -1,9 +1,9 @@
 import datetime
 from unittest.mock import MagicMock, patch
+
 import flywheel
 import fw_client
 import pytest
-
 
 from fw_gear_sitewide_snapshot.snapshot import snapshot_utils
 
