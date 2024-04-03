@@ -1,4 +1,4 @@
-from snapshot_assets import (
+from .snapshot_assets import (
     FAKE_PROJECT_ID,
     FAKE_RESPONSE,
     FAKE_SNAPSHOT_ID,

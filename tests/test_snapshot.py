@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from snapshot_assets import (
+from .snapshot_assets import (
     FAKE_BATCH_NAME,
     FAKE_DATE,
     FAKE_GROUP,
@@ -33,7 +33,7 @@ def test_trigger_snapshots_on_filter(
     test_filter = "label=Test Project"
     snapshotter.trigger_snapshots_on_filter(test_filter)
     print(mock_sdk_client.projects.find.call_args_list)
-    mock_sdk_client.projects.find.assert_called_with(test_filter)
+    mock_sdk_client.projects.iter_find.assert_called_with(test_filter)
     snapshotter.make_snapshot_on_project.assert_called_with(mock_project)
 
 

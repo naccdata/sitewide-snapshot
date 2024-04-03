@@ -1,9 +1,9 @@
 import datetime
 from unittest.mock import MagicMock, patch
-
 import flywheel
 import fw_client
 import pytest
+
 
 from fw_gear_sitewide_snapshot.snapshot import snapshot_utils
 
@@ -46,5 +46,5 @@ def mock_sdk_client(mock_project):
     sdk_client = MagicMock(spc=flywheel.Client)
     sdk_client.get_project.return_value = mock_project
     sdk_client.lookup.return_value = mock_project
-    sdk_client.projects.find.return_value = [mock_project]
+    sdk_client.projects.iter_find.return_value = [mock_project]
     return sdk_client
