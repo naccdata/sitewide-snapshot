@@ -4,7 +4,7 @@
 
 ### Summary
 
-Triggers a site-wide snapshot based off a provided filter
+Triggers snapshots across multiple projects based off a provided filter
 
 
 ### Classification
@@ -75,7 +75,7 @@ location that you control.
 
 ### Pre-requisites
 
-- User access to all projects you intent to snapshot
+- User access to all projects you intend to snapshot
 
 ## Usage
 
