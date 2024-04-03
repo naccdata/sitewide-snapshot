@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+from fw_gear_sitewide_snapshot.snapshot import snapshot
+
 from .snapshot_assets import (
     FAKE_BATCH_NAME,
     FAKE_DATE,
@@ -13,8 +15,6 @@ from .snapshot_assets import (
     mock_project,
     mock_sdk_client,
 )
-
-from fw_gear_sitewide_snapshot.snapshot import snapshot
 
 
 @patch("fw_client.FWClient")
