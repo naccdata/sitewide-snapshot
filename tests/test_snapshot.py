@@ -2,19 +2,10 @@ from unittest.mock import MagicMock, patch
 
 from fw_gear_sitewide_snapshot.snapshot import snapshot
 
-from .snapshot_assets import (
-    FAKE_BATCH_NAME,
-    FAKE_DATE,
-    FAKE_GROUP,
-    FAKE_KEY,
-    FAKE_PROJECT_ID,
-    FAKE_PROJECT_LABEL,
-    FAKE_RESPONSE,
-    FAKE_SNAPSHOT_ID,
-    mock_client,
-    mock_project,
-    mock_sdk_client,
-)
+from .snapshot_assets import (FAKE_BATCH_NAME, FAKE_DATE, FAKE_GROUP, FAKE_KEY,
+                              FAKE_PROJECT_ID, FAKE_PROJECT_LABEL,
+                              FAKE_RESPONSE, FAKE_SNAPSHOT_ID, mock_client,
+                              mock_project, mock_sdk_client)
 
 
 @patch("fw_client.FWClient")
