@@ -54,7 +54,9 @@ class Snapshotter:
         Returns:
             a dataframe of snapshot records
         """
-        projects = self.sdk_client.projects.find(project_filter)
+        if project_filter == "ALL":
+            project_filter = ""
+        projects = self.sdk_client.projects.iter_find(project_filter)
         for project in projects:
             log.debug(f"Triggering snapshot on project {project.get('label')}")
             _ = self.make_snapshot_on_project(project)

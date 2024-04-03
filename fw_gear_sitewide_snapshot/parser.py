@@ -2,8 +2,9 @@
 
 import os
 
-import utils
 from flywheel_gear_toolkit import GearToolkitContext
+
+from . import utils
 
 
 # This function mainly parses gear_context's config.json file and returns relevant

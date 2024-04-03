@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock, patch
 
-from snapshot_assets import (
+from fw_gear_sitewide_snapshot.snapshot import snapshot
+
+from .snapshot_assets import (
     FAKE_BATCH_NAME,
     FAKE_DATE,
     FAKE_GROUP,
@@ -13,8 +15,6 @@ from snapshot_assets import (
     mock_project,
     mock_sdk_client,
 )
-
-from fw_gear_sitewide_snapshot.snapshot import snapshot
 
 
 @patch("fw_client.FWClient")
@@ -33,7 +33,7 @@ def test_trigger_snapshots_on_filter(
     test_filter = "label=Test Project"
     snapshotter.trigger_snapshots_on_filter(test_filter)
     print(mock_sdk_client.projects.find.call_args_list)
-    mock_sdk_client.projects.find.assert_called_with(test_filter)
+    mock_sdk_client.projects.iter_find.assert_called_with(test_filter)
     snapshotter.make_snapshot_on_project.assert_called_with(mock_project)
 
 
