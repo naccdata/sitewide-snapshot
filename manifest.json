@@ -24,7 +24,7 @@
     },
     "gear-builder": {
       "category": "analysis",
-      "image": "flywheel/sitewide-snapshot:0.0.3"
+      "image": "flywheel/sitewide-snapshot:0.0.4a"
     }
   },
   "description": "Triggers a site-wide snapshot based off a provided filter",
@@ -51,5 +51,5 @@
   "name": "sitewide-snapshot",
   "source": "https://gitlab.com/flywheel-io/scientific-solutions/gears/sitewide-snapshot",
   "url": "https://gitlab.com/flywheel-io/scientific-solutions/gears/sitewide-snapshot",
-  "version": "0.0.3"
+  "version": "0.0.4a"
 }

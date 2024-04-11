@@ -39,7 +39,7 @@ class Snapshotter:
             a dataframe of snapshot records
         """
         for project_id in projects:
-            log.debug(f"Triggering snapshot on project {project_id}")
+            log.debug(f"Triggering snapshot on project {project_id} from list")
             _ = self.make_snapshot_on_id(project_id)
 
     def trigger_snapshots_on_filter(
@@ -58,7 +58,7 @@ class Snapshotter:
             project_filter = ""
         projects = self.sdk_client.projects.iter_find(project_filter)
         for project in projects:
-            log.debug(f"Triggering snapshot on project {project.get('label')}")
+            log.debug(f"Filter triggered snapshot on project {project.get('label')}")
             _ = self.make_snapshot_on_project(project)
 
     def make_snapshot_on_project(
@@ -100,7 +100,6 @@ class Snapshotter:
         Returns:
             the ID of the snapshot
         """
-        log.debug(f"creating snapshot on {project_id}")
         response = snapshot_utils.make_snapshot(self.snapshot_client, project_id)
         self.log_snapshot(response)
         return response

@@ -11,7 +11,7 @@ from . import utils
 # inputs and options.
 def parse_config(
     gear_context: GearToolkitContext,
-) -> (str, str, os.Pathlike, str, str):
+) -> (str, str, os.PathLike, str, str):
     """Parses necessary items out of the context object
 
     Args:
