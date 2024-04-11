@@ -5,9 +5,10 @@
 !pyproject.toml
 !run.py
 !manifest.json
-!fw_gear_skeleton
+!fw_gear_sitewide_snapshot
 !README.md
 !requirements.txt
+!dev.py
 
 # Re-ignore pycache which might be inside package dir
 **/__pycache__
